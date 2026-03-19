@@ -248,20 +248,20 @@ body{font-family:'Nunito',sans-serif;background:var(--light);color:var(--text);}
 
 /* ══ ACTIVITY ══ */
 #activity{position:fixed;inset:0;z-index:100;}
-#act-stage{position:absolute;inset:0;display:flex;}
+#act-stage{position:absolute;inset:0;display:flex;overflow:hidden;}
 .act-toolbar{position:absolute;top:14px;right:14px;z-index:300;display:flex;gap:10px;}
 .tb-btn{padding:11px 22px;border:none;border-radius:50px;font-family:'Fredoka One',cursive;
   font-size:15px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.25);transition:transform .15s;}
 .tb-btn:hover{transform:translateY(-2px);}
 .tb-reset{background:var(--yellow);color:var(--text);}
 .tb-exit{background:#fff;color:var(--text);}
-#board-area{flex:1;position:relative;overflow:visible;}
+#board-area{flex:1;position:relative;overflow:hidden;min-width:0;min-height:0;}
 #zone-grid{position:absolute;inset:0;display:grid;}
 #zone-grid.z1{grid-template-columns:1fr;grid-template-rows:1fr;}
 #zone-grid.z2{grid-template-columns:1fr 1fr;grid-template-rows:1fr;}
 #zone-grid.z4{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;}
-.zone-cell{position:relative;overflow:hidden;}
-.zone-cell-img{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;}
+.zone-cell{position:relative;overflow:hidden;background:#fff;}
+.zone-cell-img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;}
 .zone-div-v{position:absolute;top:0;right:0;bottom:0;width:3px;background:rgba(255,255,255,.3);}
 .zone-div-h{position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(255,255,255,.3);}
 .zone-cell-label{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);
@@ -377,6 +377,35 @@ body{font-family:'Nunito',sans-serif;background:var(--light);color:var(--text);}
 
 ::-webkit-scrollbar{width:5px;}
 ::-webkit-scrollbar-thumb{background:var(--pink);border-radius:10px;}
+
+/* ── Style Controls ── */
+.style-section{background:linear-gradient(90deg,#FFF8F3,#FFF5FB);border:2px solid #FFD9C0;
+  border-radius:12px;padding:12px;margin-bottom:10px;display:flex;flex-direction:column;gap:10px;}
+.style-toggle-row{display:flex;align-items:center;gap:10px;}
+.style-toggle-label{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;flex:1;}
+.toggle-switch{position:relative;width:40px;height:22px;flex-shrink:0;}
+.toggle-switch input{opacity:0;width:0;height:0;}
+.toggle-slider{position:absolute;inset:0;background:#FFD9C0;border-radius:50px;cursor:pointer;transition:background .2s;}
+.toggle-slider:before{content:'';position:absolute;width:16px;height:16px;left:3px;top:3px;
+  background:#fff;border-radius:50%;transition:transform .2s;}
+.toggle-switch input:checked + .toggle-slider{background:var(--teal);}
+.toggle-switch input:checked + .toggle-slider:before{transform:translateX(18px);}
+.style-controls{display:flex;flex-direction:column;gap:8px;}
+.style-row{display:flex;align-items:center;gap:8px;}
+.style-row-label{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;min-width:52px;}
+.shape-btns{display:flex;gap:5px;}
+.shape-btn{padding:4px 12px;border:2px solid #FFD9C0;border-radius:20px;background:none;
+  font-size:11px;font-weight:800;color:var(--muted);cursor:pointer;transition:all .15s;}
+.shape-btn.active{border-color:var(--teal);color:var(--teal);background:rgba(6,148,148,.08);}
+.color-swatches{display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
+.cswatch{width:22px;height:22px;border-radius:50%;cursor:pointer;border:2px solid transparent;
+  flex-shrink:0;transition:transform .15s;}
+.cswatch:hover{transform:scale(1.2);}
+.cswatch.active{border-color:var(--text);}
+.cswatch-custom{width:26px;height:26px;border-radius:50%;border:2px solid #FFD9C0;cursor:pointer;padding:0;overflow:hidden;}
+.opacity-slider{flex:1;accent-color:var(--coral);}
+.opacity-val{font-size:11px;font-weight:800;color:var(--coral);min-width:32px;text-align:right;}
+
 </style>
 </head>
 <body>
@@ -484,6 +513,93 @@ body{font-family:'Nunito',sans-serif;background:var(--light);color:var(--text);}
         </div>
       </div>
 
+
+      <!-- Style Controls -->
+      <div class="psec">
+        <div class="psec-title">🎨 Style Settings</div>
+        <p style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5;">These settings apply to all text and manipulatives across the whole activity.</p>
+
+        <!-- Text Backing -->
+        <div style="font-size:11px;font-weight:800;color:var(--text);margin-bottom:6px;">📝 Text Backing</div>
+        <div class="style-section">
+          <div class="style-toggle-row">
+            <span class="style-toggle-label">Show backing behind text</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="text-backing-on" checked onchange="onStyleChange()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="style-controls" id="text-backing-controls">
+            <div class="style-row">
+              <span class="style-row-label">Shape</span>
+              <div class="shape-btns">
+                <button class="shape-btn active" data-shape="rounded" onclick="setTextShape('rounded',this)">⬭ Pill</button>
+                <button class="shape-btn" data-shape="square" onclick="setTextShape('square',this)">▬ Square</button>
+              </div>
+            </div>
+            <div class="style-row">
+              <span class="style-row-label">Color</span>
+              <div class="color-swatches" id="text-color-swatches">
+                <div class="cswatch active" style="background:#069494;" data-color="#069494" onclick="setTextColor('#069494',this)"></div>
+                <div class="cswatch" style="background:#FF8243;" data-color="#FF8243" onclick="setTextColor('#FF8243',this)"></div>
+                <div class="cswatch" style="background:#2D1B00;" data-color="#2D1B00" onclick="setTextColor('#2D1B00',this)"></div>
+                <div class="cswatch" style="background:#ffffff;box-shadow:0 0 0 1px #ddd;" data-color="#ffffff" onclick="setTextColor('#ffffff',this)"></div>
+                <div class="cswatch" style="background:#FFC0CB;" data-color="#FFC0CB" onclick="setTextColor('#FFC0CB',this)"></div>
+                <div class="cswatch" style="background:#FCE883;" data-color="#FCE883" onclick="setTextColor('#FCE883',this)"></div>
+                <div class="cswatch" style="background:#1565C0;" data-color="#1565C0" onclick="setTextColor('#1565C0',this)"></div>
+                <div class="cswatch" style="background:#2E7D32;" data-color="#2E7D32" onclick="setTextColor('#2E7D32',this)"></div>
+                <input type="color" class="cswatch-custom" id="text-color-custom" value="#069494" oninput="setTextColor(this.value,null)" title="Custom color">
+              </div>
+            </div>
+            <div class="style-row">
+              <span class="style-row-label">Opacity</span>
+              <input type="range" class="opacity-slider" id="text-opacity" min="0.1" max="1" step="0.05" value="0.92" oninput="onStyleChange();document.getElementById('text-opacity-val').textContent=Math.round(this.value*100)+'%'">
+              <span class="opacity-val" id="text-opacity-val">92%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Manipulative Background -->
+        <div style="font-size:11px;font-weight:800;color:var(--text);margin-bottom:6px;">🧩 Manipulative Background</div>
+        <div class="style-section">
+          <div class="style-toggle-row">
+            <span class="style-toggle-label">Show background behind items</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="manip-bg-on" checked onchange="onStyleChange()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="style-controls" id="manip-bg-controls">
+            <div class="style-row">
+              <span class="style-row-label">Shape</span>
+              <div class="shape-btns">
+                <button class="shape-btn active" data-shape="rounded" onclick="setManipShape('rounded',this)">⬭ Rounded</button>
+                <button class="shape-btn" data-shape="circle" onclick="setManipShape('circle',this)">● Circle</button>
+                <button class="shape-btn" data-shape="square" onclick="setManipShape('square',this)">■ Square</button>
+                <button class="shape-btn" data-shape="none" onclick="setManipShape('none',this)">✦ None</button>
+              </div>
+            </div>
+            <div class="style-row">
+              <span class="style-row-label">Color</span>
+              <div class="color-swatches" id="manip-color-swatches">
+                <div class="cswatch active" style="background:#ffffff;box-shadow:0 0 0 1px #ddd;" data-color="#ffffff" onclick="setManipColor('#ffffff',this)"></div>
+                <div class="cswatch" style="background:#2D1B00;" data-color="#2D1B00" onclick="setManipColor('#2D1B00',this)"></div>
+                <div class="cswatch" style="background:#069494;" data-color="#069494" onclick="setManipColor('#069494',this)"></div>
+                <div class="cswatch" style="background:#FF8243;" data-color="#FF8243" onclick="setManipColor('#FF8243',this)"></div>
+                <div class="cswatch" style="background:#FFC0CB;" data-color="#FFC0CB" onclick="setManipColor('#FFC0CB',this)"></div>
+                <div class="cswatch" style="background:#FCE883;" data-color="#FCE883" onclick="setManipColor('#FCE883',this)"></div>
+                <input type="color" class="cswatch-custom" id="manip-color-custom" value="#ffffff" oninput="setManipColor(this.value,null)" title="Custom color">
+              </div>
+            </div>
+            <div class="style-row">
+              <span class="style-row-label">Opacity</span>
+              <input type="range" class="opacity-slider" id="manip-opacity" min="0.1" max="1" step="0.05" value="1" oninput="onStyleChange();document.getElementById('manip-opacity-val').textContent=Math.round(this.value*100)+'%'">
+              <span class="opacity-val" id="manip-opacity-val">100%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div><!-- /panel -->
 
     <div class="builder-preview">
@@ -497,7 +613,7 @@ body{font-family:'Nunito',sans-serif;background:var(--light);color:var(--text);}
         <div id="preview-board" style="opacity:0;">
           <div id="preview-board-area">
             <div id="preview-zone-grid"></div>
-            <div id="preview-q">Your question will appear here</div>
+            <div id="preview-q"></div>
           </div>
           <div id="preview-lot"></div>
         </div>
@@ -570,7 +686,10 @@ body{font-family:'Nunito',sans-serif;background:var(--light);color:var(--text);}
 <script>
 // ══ STATE ══
 var activities = [];
-var bd = { name:'', question:'', bgMode:'static', zones:[{image:null,label:''}], slides:[], items:[], lotPosition:'bottom', itemSize:80 };
+var bd = { name:'', question:'', bgMode:'static', zones:[{image:null,label:''}], slides:[], items:[], lotPosition:'bottom', itemSize:80,
+  textBacking:{ on:true, shape:'rounded', color:'#069494', opacity:0.92 },
+  manipBg:{ on:true, shape:'rounded', color:'#ffffff', opacity:1.0 }
+};
 var currentActivity = null;
 var editingIndex = -1;
 var dragState = null;
@@ -658,6 +777,7 @@ function syncUI() {
   });
   document.getElementById('zones-grid').className = 'zones-grid z' + zc;
   document.getElementById('add-choices').classList.remove('open');
+  syncStyleUI();
   setBgMode(bd.bgMode || 'static');
   renderSlideStrip();
   renderZones();
@@ -861,7 +981,8 @@ function updatePreview() {
   document.getElementById('preview-zone-grid').style.opacity = hasImage ? '1' : '0';
 
   var pvq = document.getElementById('preview-q');
-  pvq.textContent = bd.question || 'Your question will appear here';
+  pvq.textContent = bd.question || '';
+  pvq.style.display = bd.question ? '' : 'none';
 
   var pvzg = document.getElementById('preview-zone-grid');
   var n = bd.zones.length;
@@ -1015,13 +1136,38 @@ async function startActivity() {
       if(zone.image){var img=document.createElement('img');img.className='zone-cell-img';img.src=zone.image;cell.appendChild(img);}
       if(n===2&&i===0){var d=document.createElement('div');d.className='zone-div-v';cell.appendChild(d);}
       if(n===4){if(i%2===0){var dv=document.createElement('div');dv.className='zone-div-v';cell.appendChild(dv);}if(i<2){var dh=document.createElement('div');dh.className='zone-div-h';cell.appendChild(dh);}}
-      if(zone.label){var lbl=document.createElement('div');lbl.className='zone-cell-label';lbl.textContent=zone.label;cell.appendChild(lbl);}
+      if(zone.label){
+        var lbl=document.createElement('div');lbl.className='zone-cell-label';lbl.textContent=zone.label;
+        var tb=act.textBacking||{on:true,shape:'rounded',color:'#069494',opacity:.92};
+        if(!tb.on){lbl.style.background='transparent';lbl.style.boxShadow='none';}
+        else{var rgb=hexToRgb(tb.color);lbl.style.background='rgba('+rgb+','+(tb.opacity||.9)+')';lbl.style.borderRadius=tb.shape==='rounded'?'50px':'6px';}
+        var n2=parseInt((tb.color||'#069494').replace('#',''),16);
+        var br2=((n2>>16)&255)*0.299+((n2>>8)&255)*0.587+(n2&255)*0.114;
+        lbl.style.color=br2>140?'#2D1B00':'#fff';
+        cell.appendChild(lbl);
+      }
       zg.appendChild(cell);
     });
   }
 
   var q = document.getElementById('board-question');
   q.textContent = act.question||''; q.style.display = act.question?'':'none';
+  if (act.question && act.textBacking) {
+    var tb = act.textBacking;
+    if (!tb.on) {
+      q.style.background='transparent'; q.style.boxShadow='none';
+      q.style.color='#fff'; q.style.borderRadius='';
+    } else {
+      var rgb = hexToRgb(tb.color);
+      q.style.background='rgba('+rgb+','+(tb.opacity||.9)+')';
+      q.style.borderRadius = tb.shape==='rounded'?'50px':'8px';
+      q.style.boxShadow='';
+      // Pick text color based on backing color brightness
+      var n=parseInt(tb.color.replace('#',''),16);
+      var bright=((n>>16)&255)*0.299+((n>>8)&255)*0.587+(n&255)*0.114;
+      q.style.color = bright>140?'#2D1B00':'#ffffff';
+    }
+  }
 
   var lot = document.getElementById('parking-lot');
   lot.className = pos;
@@ -1076,12 +1222,27 @@ function goSlide(delta) {
 function makeDragItem(item, idx, size) {
   size = size||80;
   var lsz = Math.max(10, Math.round(size*.16));
+  var act = currentActivity || bd;
+  var mb = act.manipBg || { on:true, shape:'rounded', color:'#ffffff', opacity:1 };
+  var mbs = getManipBgStyle(mb, size);
   var el = document.createElement('div'); el.className='drag-item'; el.dataset.idx=idx;
   var iw = document.createElement('div'); iw.className='di-img'; iw.style.width=size+'px'; iw.style.height=size+'px';
+  iw.style.borderRadius = mbs.br;
+  iw.style.background = mbs.bg;
+  iw.style.border = (!mb.on||mb.shape==='none') ? 'none' : mbs.border;
+  iw.style.boxShadow = (!mb.on||mb.shape==='none') ? 'none' : '0 4px 14px rgba(0,0,0,.3)';
   if (item.type==='emoji') { iw.style.fontSize=Math.round(size*.58)+'px'; iw.textContent=item.src; }
-  else { iw.innerHTML='<img src="'+item.src+'" alt="'+esc(item.label)+'" draggable="false">'; }
+  else { iw.innerHTML='<img src="'+item.src+'" alt="'+esc(item.label)+'" draggable="false" style="border-radius:'+mbs.br+';">'; }
   var lbl = document.createElement('div'); lbl.className='di-label';
-  lbl.style.fontSize=lsz+'px'; lbl.style.maxWidth=(size+16)+'px'; lbl.textContent=item.label;
+  lbl.style.fontSize=lsz+'px'; lbl.style.maxWidth=(size+16)+'px';
+  // Apply text backing to manipulative label too
+  var tb = act.textBacking || { on:true, shape:'rounded', color:'#069494', opacity:.92 };
+  if (item.label) {
+    lbl.textContent=item.label;
+    if (!tb.on) { lbl.style.background='transparent'; lbl.style.padding='0'; }
+    else { var rgb=hexToRgb(tb.color);lbl.style.background='rgba('+rgb+','+(tb.opacity||.9)+')';lbl.style.borderRadius=tb.shape==='rounded'?'50px':'4px';lbl.style.padding='2px 8px';
+      var n=parseInt(tb.color.replace('#',''),16);var br=((n>>16)&255)*0.299+((n>>8)&255)*0.587+(n&255)*0.114;lbl.style.color=br>140?'#2D1B00':'#fff';}
+  }
   el.appendChild(iw); el.appendChild(lbl);
   el.addEventListener('pointerdown', onPointerDown);
   // Wrap in a slot so the grid space is always reserved
@@ -1250,6 +1411,105 @@ function showRocket(cb){
   el.textContent='🚀'; el.style.bottom='80px';
   document.body.appendChild(el);
   setTimeout(function(){el.remove(); cb();},900);
+}
+
+
+// ══ STYLE SETTINGS ══
+function onStyleChange() {
+  var tOn = document.getElementById('text-backing-on').checked;
+  var mOn = document.getElementById('manip-bg-on').checked;
+  bd.textBacking.on = tOn;
+  bd.manipBg.on = mOn;
+  bd.textBacking.opacity = parseFloat(document.getElementById('text-opacity').value);
+  bd.manipBg.opacity = parseFloat(document.getElementById('manip-opacity').value);
+  document.getElementById('text-backing-controls').style.opacity = tOn ? '1' : '.4';
+  document.getElementById('manip-bg-controls').style.opacity = mOn ? '1' : '.4';
+  updatePreview();
+}
+
+function setTextShape(shape, btn) {
+  bd.textBacking.shape = shape;
+  document.querySelectorAll('#text-backing-controls .shape-btn').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  updatePreview();
+}
+
+function setTextColor(color, el) {
+  bd.textBacking.color = color;
+  document.querySelectorAll('#text-color-swatches .cswatch').forEach(function(s){ s.classList.remove('active'); });
+  if (el) el.classList.add('active');
+  document.getElementById('text-color-custom').value = color;
+  updatePreview();
+}
+
+function setManipShape(shape, btn) {
+  bd.manipBg.shape = shape;
+  document.querySelectorAll('#manip-bg-controls .shape-btn').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  updatePreview();
+}
+
+function setManipColor(color, el) {
+  bd.manipBg.color = color;
+  document.querySelectorAll('#manip-color-swatches .cswatch').forEach(function(s){ s.classList.remove('active'); });
+  if (el) el.classList.add('active');
+  document.getElementById('manip-color-custom').value = color;
+  updatePreview();
+}
+
+function syncStyleUI() {
+  var tb = bd.textBacking || { on:true, shape:'rounded', color:'#069494', opacity:0.92 };
+  var mb = bd.manipBg    || { on:true, shape:'rounded', color:'#ffffff', opacity:1.0  };
+  bd.textBacking = tb; bd.manipBg = mb;
+
+  document.getElementById('text-backing-on').checked = tb.on;
+  document.getElementById('manip-bg-on').checked = mb.on;
+  document.getElementById('text-opacity').value = tb.opacity;
+  document.getElementById('text-opacity-val').textContent = Math.round(tb.opacity*100)+'%';
+  document.getElementById('manip-opacity').value = mb.opacity;
+  document.getElementById('manip-opacity-val').textContent = Math.round(mb.opacity*100)+'%';
+  document.getElementById('text-backing-controls').style.opacity = tb.on ? '1' : '.4';
+  document.getElementById('manip-bg-controls').style.opacity = mb.on ? '1' : '.4';
+
+  // Shape buttons
+  document.querySelectorAll('#text-backing-controls .shape-btn').forEach(function(b){
+    b.classList.toggle('active', b.dataset.shape === tb.shape);
+  });
+  document.querySelectorAll('#manip-bg-controls .shape-btn').forEach(function(b){
+    b.classList.toggle('active', b.dataset.shape === mb.shape);
+  });
+  // Color swatches
+  document.querySelectorAll('#text-color-swatches .cswatch').forEach(function(s){
+    s.classList.toggle('active', s.dataset.color === tb.color);
+  });
+  document.querySelectorAll('#manip-color-swatches .cswatch').forEach(function(s){
+    s.classList.toggle('active', s.dataset.color === mb.color);
+  });
+}
+
+function getTextBackingStyle(tb) {
+  if (!tb || !tb.on) return '';
+  var r = tb.shape === 'rounded' ? '50px' : '6px';
+  var rgb = hexToRgb(tb.color);
+  return 'background:rgba('+rgb+','+(tb.opacity||.9)+');border-radius:'+r+';';
+}
+
+function hexToRgb(hex) {
+  hex = hex.replace('#','');
+  if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+  var n = parseInt(hex,16);
+  return ((n>>16)&255)+','+((n>>8)&255)+','+(n&255);
+}
+
+function getManipBgStyle(mb, size) {
+  if (!mb) mb = { on:true, shape:'rounded', color:'#ffffff', opacity:1 };
+  var br;
+  if (!mb.on || mb.shape === 'none') return { bg:'transparent', br:'0', border:'none' };
+  if (mb.shape === 'circle') br = '50%';
+  else if (mb.shape === 'square') br = '6px';
+  else br = Math.round((size||80)*.14)+'px';
+  var rgb = hexToRgb(mb.color);
+  return { bg:'rgba('+rgb+','+(mb.opacity||1)+')', br:br, border:'3px solid rgba(255,255,255,.85)' };
 }
 
 // ══ INIT ══
